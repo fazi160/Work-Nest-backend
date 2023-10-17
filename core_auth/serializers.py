@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -9,27 +10,22 @@ class UserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
         }
 
-    def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        user_type = validated_data.pop('user_type', 'user')
-        instance = self.Meta.model.objects.create(**validated_data, user_type=user_type)
-        if password is not None:
-            instance.set_password(password)
-        instance.save()
-        return instance
+class myTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
 
-class CustomerSerializer(UserSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'password', 'profile_image', 'user_type']
-        extra_kwargs = {
-            'password': {'write_only': True},
-        }
+        token['email'] = user.email
+        token['user_type'] = user.user_type
+        token['is_active'] = user.is_active
+        token['is_admin'] = user.is_superuser
 
-class AdminSerializer(UserSerializer):
+        return token
+
+class GoogleAuthSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'password', 'profile_image', 'user_type']
+        model = User 
+        fields = ['id', 'username', 'email',  'password', 'profile_image', 'user_type', 'is_google']
         extra_kwargs = {
-            'password': {'write_only': True},
+            'password': {'write_only': True}
         }
