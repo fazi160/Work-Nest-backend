@@ -1,17 +1,36 @@
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.filters import SearchFilter
-from .models import User
-from .serializers import *
-from rest_framework.response import Response
+from django.contrib.auth.tokens import default_token_generator
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.http import HttpResponseRedirect
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_str, force_bytes
+from django.shortcuts import redirect
+
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    CreateAPIView,
+    GenericAPIView,
+)
+from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
+
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import status
-from django.contrib.auth import authenticate
+
+from verify_email.email_handler import send_verification_email
+
+from .models import User
+from .serializers import UserSerializer, myTokenObtainPairSerializer
+from django.conf import settings
+from django.contrib.auth import get_user_model
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = myTokenObtainPairSerializer
+
 
 class UserRegister(CreateAPIView):
     def get_serializer_class(self):
@@ -27,19 +46,55 @@ class UserRegister(CreateAPIView):
             user.user_type = "user"
             user.set_password(password)
             user.save()
+            
 
+            # creating verification token
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-            response_data = {
-                'status': 'success',
-                'msg': 'A verification link sent to your registered email address',
-                'data': serializer.data
-            }
+            # creating verification url
+            verification_url = reverse('verify-user', kwargs={'uidb64': uid, 'token': token}) + f'?context=user'
 
-            return Response(response_data, status=status.HTTP_201_CREATED)
+            # Send the verification email
+            subject = 'ArtisanHub | Activate Your Account'
+            message = f'Hi {user}, Welocme to ArtisanHub..!!  Click the following link to activate your account: {request.build_absolute_uri(verification_url)}'
+            from_email = 'copyc195@gmail.com'
+            recipient_list = [user.email]
+            send_mail(subject, message, from_email, recipient_list)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             print('Serializer errors are:', serializer.errors)
             return Response({'status': 'error', 'msg': serializer.errors})
 
+class VerifyUserView(GenericAPIView):
+    def get(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = get_user_model().objects.get(pk=uid)
+
+            if default_token_generator.check_token(user, token):
+                user.is_active = True
+                user.save()
+                context = request.GET.get('context')
+               
+
+                # Create a JWT token for the user
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+                # Include the token in the redirect URL query parameter
+                if context == 'customer':
+                     redirect_url = 'http://localhost:5173/customer/login'
+                else:
+                    redirect_url = 'http://localhost:5173/user/login'
+                return redirect(redirect_url)
+            else:
+                message = 'Activation Link expired, please register again.'
+                redirect_url = 'http://localhost:5173/user/signup'
+                return redirect(redirect_url)
+        except Exception as e:
+            message = 'Activation Link expired, please register again.'
+            redirect_url = 'http://localhost:5173/user/signup'
+            return redirect(redirect_url)
 
 
 class CustomerRegister(CreateAPIView):
@@ -57,14 +112,22 @@ class CustomerRegister(CreateAPIView):
             user.set_password(password)
             user.save()
 
+            # creating verification token
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-            response_data = {
-                'status': 'success',
-                'msg': 'A verification link sent to your registered email address',
-                'data': serializer.data
-            }
+            # creating verification url
+            verification_url = reverse('verify-user', kwargs={'uidb64': uid, 'token': token}) + f'?context=customer'
+            
 
-            return Response(response_data, status=status.HTTP_201_CREATED)
+            # Send the verification email
+            subject = 'ArtisanHub | Activate Your Account'
+            message = f'Hi {user}, Welocme to ArtisanHub..!!  Click the following link to activate your account: {request.build_absolute_uri(verification_url)}'
+            from_email = 'copyc195@gmail.com'
+            recipient_list = [user.email]
+            send_mail(subject, message, from_email, recipient_list)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         else:
             print('Serializer errors are:', serializer.errors)
             return Response({'status': 'error', 'msg': serializer.errors})
@@ -124,3 +187,4 @@ def create_jwt_pair_tokens(user):
         "access": access_token,
         "refresh": refresh_token,
     }
+
