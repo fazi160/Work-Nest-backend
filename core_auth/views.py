@@ -6,7 +6,6 @@ from django.http import HttpResponseRedirect
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 from django.shortcuts import redirect
-
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import (
@@ -17,16 +16,15 @@ from rest_framework.generics import (
 )
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
-
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from verify_email.email_handler import send_verification_email
-
 from .models import User
 from .serializers import UserSerializer, myTokenObtainPairSerializer
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate
+from rest_framework.permissions import IsAuthenticated
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = myTokenObtainPairSerializer
@@ -65,6 +63,7 @@ class UserRegister(CreateAPIView):
         else:
             print('Serializer errors are:', serializer.errors)
             return Response({'status': 'error', 'msg': serializer.errors})
+
 
 class VerifyUserView(GenericAPIView):
     def get(self, request, uidb64, token):
@@ -133,8 +132,6 @@ class CustomerRegister(CreateAPIView):
             return Response({'status': 'error', 'msg': serializer.errors})
 
 
-
-
 class GoogleAuthentication(APIView):
 
     def post(self, request):
@@ -187,4 +184,42 @@ def create_jwt_pair_tokens(user):
         "access": access_token,
         "refresh": refresh_token,
     }
+
+
+
+class UserList(ListCreateAPIView):
+    serializer_class = UserSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['email', 'username', 'user_type', 'is_active']
+
+    def get_queryset(self):
+        # # Check if the logged-in user is an admin
+        # is_admin = self.request.user.is_superuser
+
+        # # If the logged-in user is an admin, retrieve all users with 'user' user_type
+        # if is_admin:
+        #     return User.objects.filter(user_type='user').exclude(is_superuser=True)
+        # else:
+        #     # If the logged-in user is not an admin, return only their own data
+        #     return User.objects.filter(id=self.request.user.id)
+        return User.objects.filter(user_type='user').exclude(is_superuser=True)
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class CustomerList(ListCreateAPIView):
+    serializer_class = UserSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['email', 'username', 'user_type', 'is_active']
+
+    def get_queryset(self):
+        return User.objects.filter(user_type='customer')
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
 

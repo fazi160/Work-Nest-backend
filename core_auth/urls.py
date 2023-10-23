@@ -11,5 +11,9 @@ urlpatterns = [
 
     path('googleauth/', GoogleAuthentication.as_view(), name='GoogleAuthentication'),   #google authentication register section
 
-    path('verify/<str:uidb64>/<str:token>/', VerifyUserView.as_view(), name='verify-user'),
+    path('verify/<str:uidb64>/<str:token>/', VerifyUserView.as_view(), name='verify-user'), # email verification link
+
+    path('userlist/', UserList.as_view(), name='userlist'), # user list show
+    path('customerlist/', CustomerList.as_view(), name='customerlist'), # user list show
+
 ]
