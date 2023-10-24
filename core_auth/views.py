@@ -25,6 +25,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
+from .models import CustomerDetail, UserDetail
+from .serializers import CustomerDetailSerializer, UserDetailSerializer
+
+
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = myTokenObtainPairSerializer
@@ -222,4 +226,23 @@ class CustomerList(ListCreateAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
+
+
+
+
+class CustomerDetailListCreate(ListCreateAPIView):
+    queryset = CustomerDetail.objects.all()
+    serializer_class = CustomerDetailSerializer
+
+class CustomerDetailRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
+    queryset = CustomerDetail.objects.all()
+    serializer_class = CustomerDetailSerializer
+
+class UserDetailListCreate(ListCreateAPIView):
+    queryset = UserDetail.objects.all()
+    serializer_class = UserDetailSerializer
+
+class UserDetailRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
+    queryset = UserDetail.objects.all()
+    serializer_class = UserDetailSerializer
 

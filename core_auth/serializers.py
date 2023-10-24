@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import User
+from .models import CustomerDetail
+from .models import UserDetail
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,3 +44,15 @@ class CustomerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'username', 'user_type', 'is_active']
+
+
+class CustomerDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerDetail
+        fields = '__all__'
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserDetail
+        fields = '__all__'
