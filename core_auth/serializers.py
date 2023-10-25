@@ -33,7 +33,6 @@ class GoogleAuthSerializer(serializers.ModelSerializer):
         }
 
 
-
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

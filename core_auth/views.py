@@ -20,7 +20,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from verify_email.email_handler import send_verification_email
 from .models import User
-from .serializers import UserSerializer, myTokenObtainPairSerializer
+from .serializers import UserSerializer, myTokenObtainPairSerializer, GoogleAuthSerializer
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
@@ -227,10 +227,8 @@ class CustomerList(ListCreateAPIView):
         return Response(serializer.data)
     
 
-
-
-
 class CustomerDetailListCreate(ListCreateAPIView):
+    # print(request.user)
     queryset = CustomerDetail.objects.all()
     serializer_class = CustomerDetailSerializer
 
