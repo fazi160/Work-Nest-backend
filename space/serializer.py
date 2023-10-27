@@ -1,13 +1,19 @@
 # serializers.py
 from rest_framework import serializers
-from .models import CoWorkBooking, ConferenceBooking
+from .models import CoWorkBookingDate, ConferenceBookingDate, ConferenceHall, CoWorkSpace
 
-class CoWorkBookingSerializer(serializers.ModelSerializer):
+class CoWorkBookingDateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CoWorkBooking
+        model = CoWorkBookingDate
         fields = '__all__'
 
-class ConferenceBookingSerializer(serializers.ModelSerializer):
+class ConferenceBookingDateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ConferenceBooking
+        model = ConferenceBookingDate
+        fields = '__all__'
+
+
+class ConferenceHallSerialzer(serializers.ModelSerializer):
+    class Meta:
+        model = ConferenceHall
         fields = '__all__'

@@ -1,12 +1,20 @@
 # views.py
 from rest_framework import viewsets
-from .models import CoWorkBooking, ConferenceBooking
-from .serializers import CoWorkBookingSerializer, ConferenceBookingSerializer
-
+from .models import *
+from .serializer import CoWorkBookingDateSerializer, ConferenceBookingDateSerializer, ConferenceHallSerialzer
+from rest_framework.pagination import PageNumberPagination
 class CoWorkBookingViewSet(viewsets.ModelViewSet):
-    queryset = CoWorkBooking.objects.all()
-    serializer_class = CoWorkBookingSerializer
+    queryset = CoWorkBookingDate.objects.all()
+    serializer_class = CoWorkBookingDateSerializer
 
 class ConferenceBookingViewSet(viewsets.ModelViewSet):
-    queryset = ConferenceBooking.objects.all()
-    serializer_class = ConferenceBookingSerializer
+    queryset = ConferenceBookingDate.objects.all()
+    serializer_class = ConferenceBookingDateSerializer
+class CoferenceHallViewset(viewsets.ModelViewSet):
+    queryset = ConferenceHall.objects.all()
+    serializer_class= ConferenceHallSerialzer
+
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 10
+
+

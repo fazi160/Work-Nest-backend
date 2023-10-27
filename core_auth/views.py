@@ -27,6 +27,7 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from .models import CustomerDetail, UserDetail
 from .serializers import CustomerDetailSerializer, UserDetailSerializer
+from rest_framework.pagination import PageNumberPagination
 
 
 
@@ -195,22 +196,25 @@ class UserList(ListCreateAPIView):
     serializer_class = UserSerializer
     filter_backends = [SearchFilter]
     search_fields = ['email', 'username', 'user_type', 'is_active']
+    
+    # Add PageNumberPagination here
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 7  # Set the number of items per page as per your requirements
 
     def get_queryset(self):
-        # # Check if the logged-in user is an admin
-        # is_admin = self.request.user.is_superuser
-
-        # # If the logged-in user is an admin, retrieve all users with 'user' user_type
-        # if is_admin:
-        #     return User.objects.filter(user_type='user').exclude(is_superuser=True)
-        # else:
-        #     # If the logged-in user is not an admin, return only their own data
-        #     return User.objects.filter(id=self.request.user.id)
+        # Your existing code to retrieve the queryset
         return User.objects.filter(user_type='user').exclude(is_superuser=True)
+
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)  # Paginate the queryset
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
 
 
 class CustomerList(ListCreateAPIView):

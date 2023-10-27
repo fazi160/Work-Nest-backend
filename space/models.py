@@ -1,10 +1,7 @@
 from django.db import models
-
 from core_auth.models import User
 
-
 # Create your models here.
-
 
 class ConferenceHall(models.Model):
 
@@ -85,7 +82,7 @@ class CoWorkSpace(models.Model):
 
 
 
-class CoWorkBooking(models.Model):
+class CoWorkBookingDate(models.Model):
 
     space = models.ForeignKey(CoWorkSpace, on_delete=models.CASCADE)  
 
@@ -100,7 +97,7 @@ class CoWorkBooking(models.Model):
 
 
 
-class ConferenceBooking(models.Model):
+class ConferenceBookingDate(models.Model):
 
     space = models.ForeignKey(ConferenceHall, on_delete=models.CASCADE)  
 
