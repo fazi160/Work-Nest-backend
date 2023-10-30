@@ -125,8 +125,8 @@ class CustomerRegister(CreateAPIView):
             
 
             # Send the verification email
-            subject = 'ArtisanHub | Activate Your Account'
-            message = f'Hi {user}, Welocme to ArtisanHub..!!  Click the following link to activate your account: {request.build_absolute_uri(verification_url)}'
+            subject = 'Work Nest | Activate Your Account'
+            message = f'Hi {user}, Welocme to Work Nest..!!  Click the following link to activate your account: {request.build_absolute_uri(verification_url)}'
             from_email = 'copyc195@gmail.com'
             recipient_list = [user.email]
             send_mail(subject, message, from_email, recipient_list)

@@ -13,7 +13,12 @@ class ConferenceBookingDateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ConferenceHallSerialzer(serializers.ModelSerializer):
+class ConferenceHallSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConferenceHall
+        fields = '__all__'
+
+class CoWorkSpaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoWorkSpace
         fields = '__all__'

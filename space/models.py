@@ -22,17 +22,17 @@ class ConferenceHall(models.Model):
     location = models.TextField()
 
 
-    def is_date_available(self, date):
+    # def is_date_available(self, date):
 
-        bookings = ConferenceBooking.objects.filter(
+    #     bookings = ConferenceBooking.objects.filter(
 
-            space=self,
+    #         space=self,
 
-            start_date__lte=date,
-            end_date__gte=date
-        )
+    #         start_date__lte=date,
+    #         end_date__gte=date
+    #     )
 
-        return not bool(bookings)
+    #     return not bool(bookings)
 
 
     def __str__(self):
