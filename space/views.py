@@ -14,6 +14,8 @@ class ConferenceBookingViewSet(viewsets.ModelViewSet):
 
 
 
+
+# for customer works
 class ConferenceHallViewSet(viewsets.ModelViewSet):
     
     serializer_class = ConferenceHallSerializer
@@ -23,6 +25,10 @@ class ConferenceHallViewSet(viewsets.ModelViewSet):
         pagination_class = PageNumberPagination
         pagination_class.page_size = 10
         return ConferenceHall.objects.filter(customer=customer_id)
+
+
+    # def partial_update(*args, **kwargs):
+    #     print(request)
 
 
 class CoWorkSpaceViewSet(viewsets.ModelViewSet):
@@ -35,5 +41,16 @@ class CoWorkSpaceViewSet(viewsets.ModelViewSet):
         pagination_class.page_size = 10
         return CoWorkSpace.objects.filter(customer=customer_id)
 
+
+
+# for user
+
+class UserCoWorkView(viewsets.ReadOnlyModelViewSet):
+    serializer_class = CoWorkSpaceSerializer
+    queryset = CoWorkSpace.objects.filter(is_available=True)
+
+class UserConferenceHall(viewsets.ReadOnlyModelViewSet):
+    serializer_class = ConferenceHallSerializer
+    queryset = ConferenceHall.objects.filter(is_available=True)
 
 

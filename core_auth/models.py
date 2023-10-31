@@ -1,5 +1,5 @@
 from django.db import models
-
+from notifications.models import *
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
 
@@ -36,6 +36,20 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
 
     REQUIRED_FIELDS = ['username']
+
+    def save(self, *args, **kwargs):
+        created = not self.pk  # Check if this is a new instance being created
+        super(User, self).save(*args, **kwargs)
+
+        if created and self.user_type == 'customer':
+            # Create a notification when a new CoWorkSpace is created
+            notification = AdminNotificationCreate(
+                name=f"New User Created: {self.email}",
+                description=f"A new Customer created named '{self.name}'",
+                is_opened=False,
+                notification_type='register'
+            )
+            notification.save()
 
 
 

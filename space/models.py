@@ -1,6 +1,6 @@
 from django.db import models
 from core_auth.models import User
-
+from notifications.models import AdminNotificationCreate
 # Create your models here.
 
 class ConferenceHall(models.Model):
@@ -13,7 +13,7 @@ class ConferenceHall(models.Model):
 
     Capacity = models.PositiveIntegerField()
 
-    description = models.CharField(max_length=50)
+    description = models.CharField(max_length=250)
 
     image = models.ImageField(upload_to='images/space/hall')
 
@@ -22,17 +22,31 @@ class ConferenceHall(models.Model):
     location = models.TextField()
 
 
-    # def is_date_available(self, date):
+    def is_date_available(self, date):
 
-    #     bookings = ConferenceBooking.objects.filter(
+        bookings = ConferenceBooking.objects.filter(
 
-    #         space=self,
+            space=self,
 
-    #         start_date__lte=date,
-    #         end_date__gte=date
-    #     )
+            start_date__lte=date,
+            end_date__gte=date
+        )
 
-    #     return not bool(bookings)
+        return not bool(bookings)
+
+    def save(self, *args, **kwargs):
+        created = not self.pk  # Check if this is a new instance being created
+        super(ConferenceHall, self).save(*args, **kwargs)
+
+        if created:
+            # Create a notification when a new CoWorkSpace is created
+            notification = AdminNotificationCreate(
+                name=f"New Conference Hall Created: {self.name}",
+                description=f"A new Conference Hall named '{self.name}' has been created by {self.customer.email}.",
+                is_opened=False,
+                notification_type='space'
+            )
+            notification.save()
 
 
     def __str__(self):
@@ -53,7 +67,7 @@ class CoWorkSpace(models.Model):
 
     slots = models.PositiveIntegerField()
 
-    description = models.CharField(max_length=50)
+    description = models.CharField(max_length=250)
 
     image = models.ImageField(upload_to='images/space/hall')
 
@@ -73,6 +87,20 @@ class CoWorkSpace(models.Model):
         )
 
         return not bool(bookings)
+
+    def save(self, *args, **kwargs):
+        created = not self.pk  # Check if this is a new instance being created
+        super(CoWorkSpace, self).save(*args, **kwargs)
+
+        if created:
+            # Create a notification when a new CoWorkSpace is created
+            notification = AdminNotificationCreate(
+                name=f"New CoWorkSpace Created: {self.name}",
+                description=f"A new CoWorkSpace named '{self.name}' has been created by {self.customer.email}.",
+                is_opened=False,
+                notification_type='space'
+            )
+            notification.save()
 
 
     def __str__(self):
