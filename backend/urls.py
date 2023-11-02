@@ -25,8 +25,7 @@ urlpatterns = [
     path('auth/', include('core_auth.urls')),
     path('space/', include('space.urls')),
     path('notification/', include('notifications.urls')),
-
-
+    path('chat/', include('chat.urls')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

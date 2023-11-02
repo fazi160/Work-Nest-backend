@@ -42,7 +42,6 @@ class CoWorkSpaceViewSet(viewsets.ModelViewSet):
         return CoWorkSpace.objects.filter(customer=customer_id)
 
 
-
 # for user
 
 class UserCoWorkView(viewsets.ReadOnlyModelViewSet):
