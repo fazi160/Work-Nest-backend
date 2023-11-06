@@ -1,0 +1,5 @@
+For redis running
+sudo systemctl start redis-server.service
+systemctl status redis-server.service
+
+

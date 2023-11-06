@@ -28,7 +28,7 @@ class User(AbstractUser):
 
     is_google = models.BooleanField(default=False)
 
-    # is_approved = models.BooleanField(default=False)        #to check wether the customer got approved from user or not add this after creating the admin section and notification system
+    is_approved = models.BooleanField(default=False)        #to check wether the customer got approved from user or not add this after creating the admin section and notification system
 
 
 
@@ -47,7 +47,9 @@ class User(AbstractUser):
                 name=f"New User Created: {self.email}",
                 description=f"A new Customer created named '{self.name}'",
                 is_opened=False,
-                notification_type='register'
+                notification_type='register',
+                # user = self.pk
+                
             )
             notification.save()
 

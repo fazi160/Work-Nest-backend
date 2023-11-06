@@ -5,11 +5,11 @@ from .serializers import *
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import CreateAPIView,ListAPIView
+from core_auth.models import User 
 
-
-class ChatCreatingView(CreateAPIView):
-    serializer_class = MessageSerializer
-    queryset = Message.objects.all()
+# class ChatCreatingView(CreateAPIView):
+#     serializer_class = MessageSerializer
+#     queryset = Message.objects.all()
 
 
 class PreviousMessagesView(ListAPIView):
@@ -27,3 +27,10 @@ class PreviousMessagesView(ListAPIView):
         )
         return queryset
     
+class UserList(ListAPIView):
+    serializer_class = UserListSerializer
+    queryset=User.objects.filter(user_type='user')
+
+class CustomerList(ListAPIView):
+    serializer_class = UserListSerializer
+    queryset = User.objects.filter(user_type='customer')
