@@ -1,13 +1,12 @@
 import json
-
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 
 
-
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+
         current_user_id = int(self.scope["query_string"])
         other_user_id = self.scope["url_route"]["kwargs"]["id"]
         self.room_name = (
@@ -16,11 +15,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             else f"{other_user_id}_{current_user_id}"
         )
         self.room_group_name = f"chat_{self.room_name}"
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        print("connected", self.room_group_name, self.channel_layer)
         await self.accept()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        print("disconnect", self.channel_layer)
         await super().disconnect(close_code)
 
     async def receive(self, text_data=None, bytes_data=None):
@@ -75,7 +79,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return messages
 
     @database_sync_to_async
-    def save_message(self, sender,reciever, message, thread_name):
+    def save_message(self, sender, reciever, message, thread_name):
         from .serializers import MessageSerializer
         from .models import Message
-        Message.objects.create(sender=sender, receiver=reciever, message=message, thread_name=thread_name)
+        Message.objects.create(
+            sender=sender, receiver=reciever, message=message, thread_name=thread_name
+        )

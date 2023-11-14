@@ -59,8 +59,8 @@ class UserRegister(CreateAPIView):
             verification_url = reverse('verify-user', kwargs={'uidb64': uid, 'token': token}) + f'?context=user'
 
             # Send the verification email
-            subject = 'ArtisanHub | Activate Your Account'
-            message = f'Hi {user}, Welocme to ArtisanHub..!!  Click the following link to activate your account: {request.build_absolute_uri(verification_url)}'
+            subject = 'Work Nest | Activate Your Account'
+            message = f'Hi {user}, Welocme to Work Nest..!!  Click the following link to activate your account: {request.build_absolute_uri(verification_url)}'
             from_email = 'copyc195@gmail.com'
             recipient_list = [user.email]
             send_mail(subject, message, from_email, recipient_list)
@@ -134,6 +134,7 @@ class CustomerRegister(CreateAPIView):
 
         else:
             print('Serializer errors are:', serializer.errors)
+            
             return Response({'status': 'error', 'msg': serializer.errors})
 
 

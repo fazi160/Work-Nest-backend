@@ -9,7 +9,6 @@ class Message(models.Model):
     thread_name = models.CharField(null=True, blank=True, max_length=200)
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    # def __str__(self) -> str:
-    #     return f'{self.sender.first_name}-{self.sender.last_name}'
+
 
 
