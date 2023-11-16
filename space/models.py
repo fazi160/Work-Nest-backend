@@ -4,6 +4,7 @@ from notifications.models import AdminNotificationCreate
 # Create your models here.
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from django.utils import timezone
 
 class ConferenceHall(models.Model):
 
@@ -22,6 +23,9 @@ class ConferenceHall(models.Model):
     is_available = models.BooleanField(default=False)
 
     location = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=False, default=timezone.now)
+
 
 
 
@@ -85,6 +89,10 @@ class CoWorkSpace(models.Model):
     is_available = models.BooleanField(default=False)
 
     location = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=False, default=timezone.now)
+
+
 
     def is_date_available(self, date):
 

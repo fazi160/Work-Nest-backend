@@ -13,8 +13,11 @@ urlpatterns = [
 
     path('verify/<str:uidb64>/<str:token>/', VerifyUserView.as_view(), name='verify-user'), # email verification link
 
-    path('userlist/', UserList.as_view(), name='userlist'), # user list show
-    path('customerlist/', CustomerList.as_view(), name='customerlist'), # customer list show
+    path('userslist/', UserList.as_view(), name='user-list'),
+
+    path('customerlist/', CustomerList.as_view(), name='customer-list'),
+
+    path('usermanagent/<int:pk>/', UserBlock.as_view(), name='user-management'),
 
     path('customerdetails/', CustomerDetailListCreate.as_view(), name='customer-detail-list-create'),
     path('customerdetails/<int:pk>/', CustomerDetailRetrieveUpdateDestroy.as_view(), name='customer-detail-retrieve-update-destroy'),
