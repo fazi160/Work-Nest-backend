@@ -28,7 +28,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import CustomerDetail, UserDetail
 from .serializers import CustomerDetailSerializer, UserDetailSerializer
 from rest_framework.pagination import PageNumberPagination
-
+from .tasks import email_verifications
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = myTokenObtainPairSerializer
@@ -49,21 +49,21 @@ class UserRegister(CreateAPIView):
             user.user_type = "user"
             user.set_password(password)
             user.save()
+            email_verifications(user,request)
+            # # creating verification token
+            # token = default_token_generator.make_token(user)
+            # uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-            # creating verification token
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            # # creating verification url
+            # verification_url = reverse(
+            #     'verify-user', kwargs={'uidb64': uid, 'token': token}) + f'?context=user'
 
-            # creating verification url
-            verification_url = reverse(
-                'verify-user', kwargs={'uidb64': uid, 'token': token}) + f'?context=user'
-
-            # Send the verification email
-            subject = 'Work Nest | Activate Your Account'
-            message = f'Hi {user}, Welocme to Work Nest..!!  Click the following link to activate your account: {request.build_absolute_uri(verification_url)}'
-            from_email = 'copyc195@gmail.com'
-            recipient_list = [user.email]
-            send_mail(subject, message, from_email, recipient_list)
+            # # Send the verification email
+            # subject = 'Work Nest | Activate Your Account'
+            # message = f'Hi {user}, Welocme to Work Nest..!!  Click the following link to activate your account: {request.build_absolute_uri(verification_url)}'
+            # from_email = 'copyc195@gmail.com'
+            # recipient_list = [user.email]
+            # send_mail(subject, message, from_email, recipient_list)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             print('Serializer errors are:', serializer.errors)
@@ -115,21 +115,9 @@ class CustomerRegister(CreateAPIView):
             user.user_type = "customer"
             user.set_password(password)
             user.save()
+            email_verifications(user,request)
 
-            # creating verification token
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-            # creating verification url
-            verification_url = reverse(
-                'verify-user', kwargs={'uidb64': uid, 'token': token}) + f'?context=customer'
-
-            # Send the verification email
-            subject = 'Work Nest | Activate Your Account'
-            message = f'Hi {user}, Welocme to Work Nest..!!  Click the following link to activate your account: {request.build_absolute_uri(verification_url)}'
-            from_email = 'copyc195@gmail.com'
-            recipient_list = [user.email]
-            send_mail(subject, message, from_email, recipient_list)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         else:
@@ -280,11 +268,3 @@ class UserDetailRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
 
 
 
-# a sample code for celery
-
-# from django.http import HttpResponse
-# from .tasks import send_mail_sample
-
-# def send_view(request):
-#     send_mail_sample.delay("fazifazil160160@gmail.com")
-#     return HttpResponse("it's sended")

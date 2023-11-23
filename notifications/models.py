@@ -1,5 +1,9 @@
 from django.db import models
-# from core_auth.models import User
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import time
+from celery import shared_task
 
 # from space.models import ConferenceHall, CoWorkSpace
 class AdminNotificationCreate(models.Model):
@@ -29,3 +33,15 @@ class AdminNotificationCreate(models.Model):
     def __str__(self):  
         return self.name
     
+# Celery task
+@shared_task()
+def process_notification(instance_name):
+    # Print some text to the console (replace this with your desired action)
+    print(f"Notification created: {instance_name}")
+
+# Signal handler function
+@receiver(post_save, sender=AdminNotificationCreate)
+def show_text_on_console(sender, instance, created, **kwargs):
+    if created:
+        # Call the Celery task asynchronously
+        process_notification.apply_async(args=[instance.name], countdown=60)

@@ -1,9 +1,9 @@
 from django.apps import AppConfig
 
 
-class NotificationsConfig(AppConfig):
+class PremiumConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'notifications'
-    
+    name = 'premium'
+
     def ready(self):
         import premium.models

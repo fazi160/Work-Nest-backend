@@ -114,10 +114,10 @@ class CoWorkSpace(models.Model):
             # Create a notification when a new CoWorkSpace is created
             notification = AdminNotificationCreate(
                 name=f"New CoWorkSpace Created: {self.name}",
-                description=f"A new CoWorkSpace named '{self.name}' has been created by {self.customer.email}.",
+                description=f"A new Co-Working Space named '{self.name}' has been created by {self.customer.email}.",
                 is_opened=False,
-                notification_type='cospace',
-                cowork=self.pk
+                notification_type='cowork',
+                key=self.pk
             )
             notification.save()
 

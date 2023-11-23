@@ -7,4 +7,6 @@ router.register(r'admin_notification', NotificationViewSet, basename='admin_noti
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('detailview/<str:type>/<int:id>/', NotificationDetailView.as_view(), name='NotificationDetailView'),
+    path('blockunblock/<str:type>/<int:id>/', BlockUnblockView.as_view(), name='block_unblock_view'),
 ]

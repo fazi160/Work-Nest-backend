@@ -80,3 +80,6 @@ class UserDetail(models.Model):
 
     contact = models.CharField()
 
+
+
+    
