@@ -275,3 +275,16 @@ class UserDetailListCreate(ListCreateAPIView):
 class UserDetailRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
     queryset = UserDetail.objects.all()
     serializer_class = UserDetailSerializer
+
+
+
+
+
+# a sample code for celery
+
+# from django.http import HttpResponse
+# from .tasks import send_mail_sample
+
+# def send_view(request):
+#     send_mail_sample.delay("fazifazil160160@gmail.com")
+#     return HttpResponse("it's sended")

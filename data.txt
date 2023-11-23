@@ -2,4 +2,5 @@ For redis running
 sudo systemctl start redis-server.service
 systemctl status redis-server.service
 
-
+for redis
+celery -A backend.celery worker --pool=solo -l info

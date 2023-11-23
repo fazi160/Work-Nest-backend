@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_simplejwt',
+    'django_celery_results',
+    'django_celery_beat',
 
 
     'channels',
@@ -222,6 +224,16 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+# Celery settings
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kolkata'
 
 # CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
 # CELERY_ACCEPT_CONTENT = ['application/json']

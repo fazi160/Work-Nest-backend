@@ -25,4 +25,5 @@ urlpatterns = [
     path('userdetails/', UserDetailListCreate.as_view(), name='user-detail-list-create'),
     path('userdetails/<int:pk>/', UserDetailRetrieveUpdateDestroy.as_view(), name='user-detail-retrieve-update-destroy'),
 
+    # path('celery/', send_view, name='send view')      # celery sample code url 
 ]
