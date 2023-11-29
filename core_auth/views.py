@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
@@ -13,6 +14,7 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
     CreateAPIView,
     GenericAPIView,
+    RetrieveAPIView
 )
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
@@ -29,6 +31,10 @@ from .models import CustomerDetail, UserDetail
 from .serializers import CustomerDetailSerializer, UserDetailSerializer
 from rest_framework.pagination import PageNumberPagination
 from .tasks import email_verifications
+from premium.models import PremiumCustomer
+from premium.serializers import PremiumCustomerSerializer
+from datetime import date
+
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = myTokenObtainPairSerializer
@@ -49,21 +55,8 @@ class UserRegister(CreateAPIView):
             user.user_type = "user"
             user.set_password(password)
             user.save()
-            email_verifications(user,request)
-            # # creating verification token
-            # token = default_token_generator.make_token(user)
-            # uid = urlsafe_base64_encode(force_bytes(user.pk))
+            email_verifications(user, request)
 
-            # # creating verification url
-            # verification_url = reverse(
-            #     'verify-user', kwargs={'uidb64': uid, 'token': token}) + f'?context=user'
-
-            # # Send the verification email
-            # subject = 'Work Nest | Activate Your Account'
-            # message = f'Hi {user}, Welocme to Work Nest..!!  Click the following link to activate your account: {request.build_absolute_uri(verification_url)}'
-            # from_email = 'copyc195@gmail.com'
-            # recipient_list = [user.email]
-            # send_mail(subject, message, from_email, recipient_list)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             print('Serializer errors are:', serializer.errors)
@@ -115,8 +108,7 @@ class CustomerRegister(CreateAPIView):
             user.user_type = "customer"
             user.set_password(password)
             user.save()
-            email_verifications(user,request)
-
+            email_verifications(user, request)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -201,7 +193,6 @@ class UserList(ListCreateAPIView):
         return Response(serializer.data)
 
 
-
 class UserBlock(APIView):
     def put(self, request, *args, **kwargs):
         # Get the value from the URL parameter
@@ -227,7 +218,6 @@ class UserBlock(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class CustomerList(ListCreateAPIView):
@@ -265,6 +255,52 @@ class UserDetailRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
     serializer_class = UserDetailSerializer
 
 
+class UserDetail(RetrieveAPIView):
+    def get(self, request, *args, **kwargs):
+        user_id = self.kwargs.get('pk')
+        print(user_id, "fdsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsa")
 
+        try:
+            user = User.objects.get(id=user_id)
+            user_type = user.user_type  # Assuming user_type is a field in your User model
 
+            if user_type == 'customer':
+                customer_data = CustomerDetail.objects.filter(
+                    user=user).first()
+                premium_customer_data = PremiumCustomer.objects.filter(
+                    user=user).first()
 
+                customer_serializer = CustomerDetailSerializer(customer_data)
+                premium_customer_serializer = (
+                    PremiumCustomerSerializer(
+                        premium_customer_data) if premium_customer_data else None
+                )
+
+                response_data = {
+                    'customer_data': customer_serializer.data if customer_serializer else None,
+                    'premium_customer_data': premium_customer_serializer.data if premium_customer_serializer else None,
+                }
+
+                # Check if premium plan is expired
+                if premium_customer_data and premium_customer_data.exp_date < date.today():
+                    response_data['premium_expired'] = True
+                else:
+                    response_data['premium_expired'] = False
+
+            elif user_type == 'user':
+                data = User.objects.get(id=user_id)
+                serializer = UserDetailSerializer(data)
+                response_data = {'user_data': serializer.data}
+
+            else:
+                # Handle other user types or raise an exception if needed
+                return Response({"detail": "Invalid user type"}, status=400)
+
+            return Response(response_data)
+
+        except User.DoesNotExist:
+            raise Http404("User does not exist")
+        except CustomerDetail.DoesNotExist:
+            return Response({"detail": "Customer data does not exist"}, status=404)
+        except PremiumCustomer.DoesNotExist:
+            return Response({"detail": "Premium customer data does not exist"}, status=404)

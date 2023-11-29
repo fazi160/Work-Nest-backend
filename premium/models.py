@@ -15,10 +15,14 @@ class PremiumPackages(models.Model):
     description = models.CharField(max_length=250)
     color = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.name
+    
+
 class PremiumCustomer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     package = models.ForeignKey(PremiumPackages, on_delete=models.CASCADE)
-    start_date = models.DateField(auto_now_add=True)  # Set only when the object is created
+    start_date = models.DateField(auto_now_add=True)  
     exp_date = models.DateField()
     is_active = models.BooleanField(default=False)
 
@@ -28,6 +32,8 @@ class PremiumCustomer(models.Model):
 
         self.exp_date = self.start_date + timedelta(days=self.package.validity)
         super().save(*args, **kwargs)
+        
+    
 
 
 @receiver(post_save, sender=PremiumCustomer)
