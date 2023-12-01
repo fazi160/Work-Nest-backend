@@ -32,9 +32,8 @@ class PremiumCustomer(models.Model):
 
         self.exp_date = self.start_date + timedelta(days=self.package.validity)
         super().save(*args, **kwargs)
-        
-    
 
+    
 
 @receiver(post_save, sender=PremiumCustomer)
 def schedule_expiration_task(sender, instance, created, **kwargs):

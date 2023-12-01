@@ -258,8 +258,6 @@ class UserDetailRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
 class UserDetail(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         user_id = self.kwargs.get('pk')
-        print(user_id, "fdsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsadsa")
-
         try:
             user = User.objects.get(id=user_id)
             user_type = user.user_type  # Assuming user_type is a field in your User model

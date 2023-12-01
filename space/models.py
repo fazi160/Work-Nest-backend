@@ -1,7 +1,6 @@
 from django.db import models
 from core_auth.models import User
 from notifications.models import AdminNotificationCreate
-# Create your models here.
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.utils import timezone
@@ -34,7 +33,7 @@ class ConferenceHall(models.Model):
         super(ConferenceHall, self).save(*args, **kwargs)
 
         if created:
-            print('its workkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk', self.id)
+            
             # Create a notification when a new ConferenceHall is created
             notification = AdminNotificationCreate(
                 name=f"New Conference Hall Created: {self.name}",
@@ -58,19 +57,9 @@ class ConferenceHall(models.Model):
 
     def __str__(self):
 
-        return self.name
+        return self.name, self.id
 
-    # def is_date_available(self, date):
 
-    #     bookings = ConferenceBooking.objects.filter(
-
-    #         space=self,
-
-    #         start_date__lte=date,
-    #         end_date__gte=date
-    #     )
-
-    #     return not bool(bookings)
 
 class CoWorkSpace(models.Model):
 
@@ -94,17 +83,6 @@ class CoWorkSpace(models.Model):
 
 
 
-    def is_date_available(self, date):
-
-        bookings = CoWorkBooking.objects.filter(
-
-            space=self,
-
-            start_date__lte=date,
-            end_date__gte=date
-        )
-
-        return not bool(bookings)
 
     def save(self, *args, **kwargs):
         created = not self.pk  # Check if this is a new instance being created
@@ -126,27 +104,20 @@ class CoWorkSpace(models.Model):
         return self.name
 
 
-class CoWorkBookingDate(models.Model):
 
-    space = models.ForeignKey(CoWorkSpace, on_delete=models.CASCADE)
+class ConferenceHallBooking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    hall = models.ForeignKey(ConferenceHall, on_delete=models.CASCADE)
+    booking_date = models.DateField()
+    price = models.IntegerField(null=True)
 
-    start_date = models.DateField()
-
-    end_date = models.DateField()
-
-    def __str__(self):
-
-        return f"Booking for {self.space} by {self.customer}"
-
-
-class ConferenceBookingDate(models.Model):
-
-    space = models.ForeignKey(ConferenceHall, on_delete=models.CASCADE)
-
-    start_date = models.DateField()
-
-    end_date = models.DateField()
+    def save(self, *args, **kwargs):
+        
+        self.price = self.hall.price
+        super().save(*args, **kwargs)
 
     def __str__(self):
+        return f"{self.hall.name} - {self.user.email}"
 
-        return f"Booking for {self.space} by {self.customer}"
+    
+

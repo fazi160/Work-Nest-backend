@@ -7,6 +7,8 @@ router = DefaultRouter()
 router.register(r'conference-halls/(?P<customer_id>\d+)', ConferenceHallViewSet, basename='conferencehall')
 router.register(r'cowork-spaces/(?P<customer_id>\d+)', CoWorkSpaceViewSet, basename='coworkspace')
 
+# Booking
+# router.register(r'bookings', BookingViewSet, basename='booking')
 
 # for user
 router.register(r'conference', UserConferenceHall, basename='userConference')
@@ -15,6 +17,12 @@ router.register(r'cowork',UserCoWorkView, basename='userCoWork')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('booking/payment/', StripePaymentSpace.as_view(), name = 'premium_payment'),
+    path('conference/<int:hall_id>/book/', BookConferenceHall.as_view(), name='BookConferenceHall'),
+    path('conference/booking/register/', ConferenceHallBookingView.as_view(), name='conference_hall_booking'),
+    path('hall/salesreport/', SpaceSalesReport.as_view(), name='SpaceSalesReport')
+    # path('hall/salesreport/<int:id>/', SpaceSalesReport.as_view(), name='SpaceSalesReport')
+
 ]
 
 

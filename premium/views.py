@@ -1,7 +1,7 @@
 # views.py
 from rest_framework import viewsets
 from .models import PremiumPackages, PremiumCustomer
-from .serializers import PremiumPackagesSerializer
+from .serializers import PremiumPackagesSerializer, PremiumCustomerSerializer
 from django.conf import settings
 from rest_framework.views import APIView
 import stripe
@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from core_auth.models import User
-
+from rest_framework.generics import RetrieveAPIView, ListAPIView
 from decouple import config
 class PremiumPackagesViewSet(viewsets.ModelViewSet):
     queryset = PremiumPackages.objects.all()
@@ -88,3 +88,7 @@ class PaymentSuccess(APIView):
 
         return Response({"message": "Payment successful"}, status=status.HTTP_200_OK)
 
+
+class PremiumSalesReport(ListAPIView):
+    queryset = PremiumCustomer.objects.all()
+    serializer_class = PremiumCustomerSerializer
