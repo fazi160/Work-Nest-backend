@@ -85,3 +85,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Message.objects.create(
             sender=sender, receiver=reciever, message=message, thread_name=thread_name
         )
+
+
+
+
+

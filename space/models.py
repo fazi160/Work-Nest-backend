@@ -4,12 +4,16 @@ from notifications.models import AdminNotificationCreate
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+# from .consumers import SpaceNotificationConsumer
+
 
 class ConferenceHall(models.Model):
 
     customer = models.ForeignKey(User,  on_delete=models.CASCADE)
 
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=150)
 
     price = models.PositiveIntegerField()
 
@@ -24,9 +28,6 @@ class ConferenceHall(models.Model):
     location = models.TextField()
 
     created_at = models.DateTimeField(auto_now_add=False, default=timezone.now)
-
-
-
 
     def save(self, *args, **kwargs):
         created = not self.pk  # Check if this is a new instance being created
@@ -44,28 +45,16 @@ class ConferenceHall(models.Model):
             )
             notification.save()
 
-            # Send a notification event
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                "notifications",  # Channel name for notifications
-                {
-                    "type": "send.notification",
-                    "message": f"New notification: {notification.name}",
-                },
-            )
-
-
     def __str__(self):
 
-        return self.name, self.id
-
+        return self.name
 
 
 class CoWorkSpace(models.Model):
 
     customer = models.ForeignKey(User,  on_delete=models.CASCADE)
 
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=150)
 
     price = models.PositiveIntegerField()
 
@@ -73,16 +62,13 @@ class CoWorkSpace(models.Model):
 
     description = models.CharField(max_length=250)
 
-    image = models.ImageField(upload_to='images/space/hall')
+    image = models.ImageField(upload_to='images/space/cowork')
 
     is_available = models.BooleanField(default=False)
 
     location = models.TextField()
 
     created_at = models.DateTimeField(auto_now_add=False, default=timezone.now)
-
-
-
 
     def save(self, *args, **kwargs):
         created = not self.pk  # Check if this is a new instance being created
@@ -104,7 +90,6 @@ class CoWorkSpace(models.Model):
         return self.name
 
 
-
 class ConferenceHallBooking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     hall = models.ForeignKey(ConferenceHall, on_delete=models.CASCADE)
@@ -112,12 +97,15 @@ class ConferenceHallBooking(models.Model):
     price = models.IntegerField(null=True)
 
     def save(self, *args, **kwargs):
-        
+
         self.price = self.hall.price
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.hall.name} - {self.user.email}"
 
-    
+
+
+
+
 

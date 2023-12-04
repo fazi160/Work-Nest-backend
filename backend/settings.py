@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_simplejwt',
     'django_celery_results',
-
+    # 'webpush',
 
 
     'channels',
@@ -63,7 +63,11 @@ INSTALLED_APPS = [
 
 # CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-
+# WEBPUSH_SETTINGS = {
+#    "VAPID_PUBLIC_KEY": "BAsDZYBTqYhK1pzAw0neiH8kBsTErBkNo0SoXhpZpE6yLHuQmYP91F3XLaxGiMZ_A8c8vk7uCJK5cpIgHaEctDc",
+#    "VAPID_PRIVATE_KEY": "a2QRDb_KPvGjvFEL_Fg40m5KY95lI1fUMlQk9QHwP9w",
+#    "VAPID_ADMIN_EMAIL": "copyc195@gmail.com"
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

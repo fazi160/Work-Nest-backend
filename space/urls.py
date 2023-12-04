@@ -20,7 +20,8 @@ urlpatterns = [
     path('booking/payment/', StripePaymentSpace.as_view(), name = 'premium_payment'),
     path('conference/<int:hall_id>/book/', BookConferenceHall.as_view(), name='BookConferenceHall'),
     path('conference/booking/register/', ConferenceHallBookingView.as_view(), name='conference_hall_booking'),
-    path('hall/salesreport/', SpaceSalesReport.as_view(), name='SpaceSalesReport')
+    path('hall/salesreport/', SpaceSalesReport.as_view(), name='SpaceSalesReport'),
+    # path('/button_click/', ButtonClickView.as_view(), name='button_click'),
     # path('hall/salesreport/<int:id>/', SpaceSalesReport.as_view(), name='SpaceSalesReport')
 
 ]

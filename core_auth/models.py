@@ -1,7 +1,7 @@
 from django.db import models
-from notifications.models import *
+from notifications.models import AdminNotificationCreate
 from django.contrib.auth.models import AbstractUser, Group, Permission
-
+# from webpush.models import WebPushDevice
 
 class User(AbstractUser):
 
@@ -52,6 +52,12 @@ class User(AbstractUser):
                 
             )
             notification.save()
+
+    # def get_push_subscriptions(self):
+    #     return WebPushDevice.objects.filter(user=self)
+
+    # def get_push_subscription_info(self):
+    #     return [subscription.subscription_info for subscription in self.get_push_subscriptions()]
 
 
 
