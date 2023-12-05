@@ -34,7 +34,7 @@ class ConferenceHall(models.Model):
         super(ConferenceHall, self).save(*args, **kwargs)
 
         if created:
-            
+
             # Create a notification when a new ConferenceHall is created
             notification = AdminNotificationCreate(
                 name=f"New Conference Hall Created: {self.name}",
@@ -105,7 +105,15 @@ class ConferenceHallBooking(models.Model):
         return f"{self.hall.name} - {self.user.email}"
 
 
+class CoworkSpaceBooking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    space = models.ForeignKey(CoWorkSpace, on_delete=models.CASCADE)
+    booking_date = models.DateField()
+    price = models.IntegerField(null=True)
 
+    def save(self, *args, **kwargs):
+        self.price = self.space.price
+        super().save(*args, **kwargs)
 
-
-
+    def __str__(self):
+        return f"{self.space.name} - {self.user.email}"

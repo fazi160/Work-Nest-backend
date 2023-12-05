@@ -4,4 +4,4 @@ from .models import *
 admin.site.register(ConferenceHall)
 admin.site.register(CoWorkSpace)
 admin.site.register(ConferenceHallBooking)
-# admin.site.register(WebSocketMessage)
+admin.site.register(CoworkSpaceBooking)

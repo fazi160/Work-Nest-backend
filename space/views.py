@@ -7,7 +7,7 @@ from channels.layers import get_channel_layer
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from .models import *
-from .serializer import ConferenceHallSerializer, CoWorkSpaceSerializer, ConferenceHallBookingSerializer
+from .serializer import ConferenceHallSerializer, CoWorkSpaceSerializer, ConferenceHallBookingSerializer, CoworkSpaceBookingSerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 import stripe
@@ -15,7 +15,8 @@ from datetime import datetime
 from django.shortcuts import get_object_or_404
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-
+from decouple import config
+from django.db.models import Count, F
 # for customer works
 
 
@@ -28,8 +29,6 @@ class ConferenceHallViewSet(viewsets.ModelViewSet):
         pagination_class = PageNumberPagination
         pagination_class.page_size = 10
         return ConferenceHall.objects.filter(customer=customer_id)
-
-
 
 
 
@@ -63,38 +62,26 @@ class BookConferenceHall(APIView):
         serializer = ConferenceHallBookingSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    # def post(self, request, hall_id):
-    #     hall = ConferenceHall.objects.get(pk=hall_id)
-    #     booking_date = request.data.get('booking_date')
-    #     user_id = request.data.get('user_id')
-
-    #     # Check if the date is available
-    #     if not ConferenceHallBooking.objects.filter(hall=hall, booking_date=booking_date).exists():
-    #         # Create a new booking
-    #         booking = ConferenceHallBooking(hall=hall, booking_date=booking_date, user=user_id)
-    #         booking.save()
-    #         return Response({'message': 'Booking successful'}, status=status.HTTP_201_CREATED)
-    #     else:
-    #         return Response({'message': 'The hall is already booked for this date'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-stripe.api_key = 'sk_test_51OFqIQSJiD5G4hPsOp9WDdHeFzGx7va82AmGoZfCXQWfdZILiQgIRY87lYDMQxiy4UoPzb79c7LopwQgNW6aNFdH00cGrA0FV7'
+
+stripe.api_key = config('STRIPE_SECRET_KEY')
 
 
 class StripePaymentSpace(APIView):
     def post(self, request):
-        print("the functions is called..........................................................................................")
+
         try:
             data = request.data
             userId = data.get('userId')
             planId = data.get('planId')
             date = data.get('date')
+            spaceType = data.get('spaceType')
 
-            print(userId, planId, date,
-                  "fdsaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaafdsafdfa")
+            print(data, userId, planId, date, spaceType,"---------------------------------------------=======================")
 
             # You can use the received data to customize the Stripe session creation
-            success_url = f'http://localhost:5173/user/spacedetails/payment/success/?userId={userId}&planId={planId}&date={date}'
+            success_url = f'http://localhost:5173/user/spacedetails/payment/success/?userId={userId}&planId={planId}&date={date}&type={spaceType}'
 
             cancel_url = 'http://localhost:5173/user/spacedetails/payment/canceled'
             session = stripe.checkout.Session.create(
@@ -102,9 +89,9 @@ class StripePaymentSpace(APIView):
                     'price_data': {
                         'currency': data.get('currency', 'INR'),
                         'product_data': {
-                            'name': data.get('space_name', 'sample'),
+                            'name': data.get('name', 'sample'),
                         },
-                        'unit_amount': data.get('price', 100 * 100),
+                        'unit_amount': data.get('unit_amount', 100 * 100),
                     },
                     'quantity': data.get('quantity', 1),
                 }],
@@ -117,6 +104,7 @@ class StripePaymentSpace(APIView):
 
             return Response({"message": session}, status=status.HTTP_200_OK)
         except Exception as e:
+            print("-----------------------------------------------------------------------------------------------------------------------")
             return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -172,4 +160,68 @@ class SpaceSalesReport(APIView):
 
         # Serialize the queryset before returning it in the response
         serializer = ConferenceHallBookingSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class CoworkSpaceBookingDataView(APIView):
+    def get(self, request, space_id):
+        # Aggregate the number of bookings for each date
+        unique_dates = CoworkSpaceBooking.objects.filter(space=space_id).values('booking_date', 'space__slots').annotate(total_bookings=Count('booking_date'))
+
+        # Create a list of dictionaries with date and left_space
+        response_data = [{'date': entry['booking_date'], 'left_space': entry['space__slots'] - entry['total_bookings']} for entry in unique_dates]
+
+        return Response(response_data)
+
+
+
+class CoWorkingSpaceBookingView(APIView):
+    def post(self, request):
+        try:
+            print("try is started")
+            user_id = self.request.data.get('userId')
+            plan_id = self.request.data.get('planId')
+            date_str = self.request.data.get('date')
+
+            date_str = str(date_str)
+            print(type(date_str))
+            # Convert the date string to a datetime object
+            date_object = datetime.strptime(date_str, '%d/%m/%Y')
+            formatted_date = date_object.date()
+
+            # Retrieve the coworking space based on the plan_id
+            space = get_object_or_404(CoWorkSpace, id=plan_id)
+
+            # Check if available slots for the given space and date are greater than 0
+            total_bookings_in_a_day = CoworkSpaceBooking.objects.filter(
+                space=space,
+                booking_date=formatted_date
+            ).count()
+
+            available_slots = space.slots - total_bookings_in_a_day
+
+            if available_slots > 0:
+                # If available slots are greater than 0, create a new booking
+                booking = CoworkSpaceBooking(
+                    user_id=user_id, space=space, booking_date=formatted_date)
+                booking.save()
+                return Response({"message": "Success"}, status=status.HTTP_201_CREATED)
+            else:
+                # If available slots are 0 or less, return an error message
+                return Response({"error": "No available slots for the given date and space"}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class CoworkingSpaceSalesReport(APIView):
+    def get(self, request):
+        user_id = request.query_params.get('user_id')
+
+        if not user_id:
+            return Response({"error": "user_id is required in the query parameters."}, status=400)
+        
+        queryset = CoworkSpaceBooking.objects.filter(space__customer=user_id)
+        serializer = CoworkSpaceBookingSerializer(queryset, many=True)
         return Response(serializer.data)
