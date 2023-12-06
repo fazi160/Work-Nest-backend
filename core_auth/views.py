@@ -34,7 +34,7 @@ from .tasks import email_verifications
 from premium.models import PremiumCustomer
 from premium.serializers import PremiumCustomerSerializer
 from datetime import date
-
+from rest_framework import viewsets, status
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = myTokenObtainPairSerializer
@@ -255,7 +255,7 @@ class UserDetailRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
     serializer_class = UserDetailSerializer
 
 
-class UserDetail(RetrieveAPIView):
+class CustomerDetails(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         user_id = self.kwargs.get('pk')
         try:
@@ -302,3 +302,44 @@ class UserDetail(RetrieveAPIView):
             return Response({"detail": "Customer data does not exist"}, status=404)
         except PremiumCustomer.DoesNotExist:
             return Response({"detail": "Premium customer data does not exist"}, status=404)
+
+
+from rest_framework.generics import CreateAPIView
+
+# class UserDetailsCreate(CreateAPIView):
+#     queryset = UserDetail.objects.all()
+#     serializer_class = UserDetailSerializer
+
+#     def perform_create(self, serializer):
+#         serializer.save(user=self.request.user)
+
+# class UserDetails(RetrieveUpdateDestroyAPIView):
+#     queryset = UserDetail.objects.all()
+#     serializer_class = UserDetailSerializer
+
+#     def get(self, request, *args, **kwargs):
+#         user_id = self.kwargs.get('pk')
+#         try:
+#             queryset = UserDetail.objects.get(user=user_id)
+#             serializer = self.get_serializer(queryset)
+#             return Response(serializer.data)
+#         except UserDetail.DoesNotExist:
+#             return Response({'detail': "The data does not exist"}, status=404)
+
+        
+
+class UserDetailViewSet(viewsets.ModelViewSet):
+    serializer_class = UserDetailSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        return UserDetail.objects.filter(user=user_id)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+

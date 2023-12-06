@@ -1,5 +1,3 @@
-# views.py
-# from .serializers import ConferenceHallSerializer
 from .models import ConferenceHall
 from django.http import JsonResponse
 from asgiref.sync import async_to_sync
@@ -7,7 +5,7 @@ from channels.layers import get_channel_layer
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from .models import *
-from .serializer import ConferenceHallSerializer, CoWorkSpaceSerializer, ConferenceHallBookingSerializer, CoworkSpaceBookingSerializer
+from .serializer import ConferenceHallSerializer, CoWorkSpaceSerializer, ConferenceHallBookingSerializer, CoworkSpaceBookingSerializer, UserPurchaseReportSerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 import stripe
@@ -17,8 +15,7 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from decouple import config
 from django.db.models import Count, F
-# for customer works
-
+from rest_framework.generics import RetrieveAPIView
 
 class ConferenceHallViewSet(viewsets.ModelViewSet):
 
@@ -225,3 +222,20 @@ class CoworkingSpaceSalesReport(APIView):
         queryset = CoworkSpaceBooking.objects.filter(space__customer=user_id)
         serializer = CoworkSpaceBookingSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class UserPurchaseReport(RetrieveAPIView):
+    serializer_class = UserPurchaseReportSerializer
+
+    def get_object(self):
+        user_id = self.kwargs['pk']
+        conference_hall_bookings = ConferenceHallBooking.objects.filter(user=user_id)
+        cowork_space_bookings = CoworkSpaceBooking.objects.filter(user=user_id)
+
+        data = {
+            'conference_hall_bookings': conference_hall_bookings,
+            'cowork_space_bookings': cowork_space_bookings,
+        }
+
+        return data
+    

@@ -42,3 +42,8 @@ class CoworkSpaceBookingSerializer(serializers.ModelSerializer):
         ).count()
         print(obj.space.slots - total_bookings_in_a_day,"left_spaceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
         return obj.space.slots - total_bookings_in_a_day
+
+
+class UserPurchaseReportSerializer(serializers.Serializer):
+    conference_hall_bookings = ConferenceHallBookingSerializer(many=True)
+    cowork_space_bookings = CoworkSpaceBookingSerializer(many=True)

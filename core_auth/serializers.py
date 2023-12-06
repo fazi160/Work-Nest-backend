@@ -4,13 +4,16 @@ from .models import User
 from .models import CustomerDetail
 from .models import UserDetail
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'profile_image', 'user_type', 'is_active']
+        fields = ['id', 'username', 'email', 'password',
+                  'profile_image', 'user_type', 'is_active']
         extra_kwargs = {
             'password': {'write_only': True},
         }
+
 
 class myTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -24,10 +27,12 @@ class myTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         return token
 
+
 class GoogleAuthSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User 
-        fields = ['id', 'username', 'email',  'password', 'profile_image', 'user_type', 'is_google']
+        model = User
+        fields = ['id', 'username', 'email',  'password',
+                  'profile_image', 'user_type', 'is_google']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -37,6 +42,7 @@ class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'username', 'user_type', 'is_active']
+
 
 class CustomerListSerializer(serializers.ModelSerializer):
 
@@ -52,6 +58,10 @@ class CustomerDetailSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
+    user_main = UserSerializer(source='user', read_only=True)
     class Meta:
         model = UserDetail
         fields = '__all__'
+
+
+

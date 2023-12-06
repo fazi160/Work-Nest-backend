@@ -24,6 +24,7 @@ urlpatterns = [
     path('cowork/booking/register/', CoWorkingSpaceBookingView.as_view(), name='co_work_booking'),
     path('hall/salesreport/', SpaceSalesReport.as_view(), name='SpaceSalesReport'),
     path('co-work/salesreport/', CoworkingSpaceSalesReport.as_view(), name='CoWorkSalesReport'),
+    path('user/purchase/<int:pk>/', UserPurchaseReport.as_view(), name='UserPurchaseReport')
 ]
 
 
