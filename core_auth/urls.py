@@ -9,6 +9,7 @@ router.register(r'user/details/(?P<user_id>\d+)', UserDetailViewSet, basename='U
 
 urlpatterns = [
     path('',include(router.urls)),
+    
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 

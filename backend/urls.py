@@ -27,6 +27,7 @@ urlpatterns = [
     path('notification/', include('notifications.urls')),
     path('chat/', include('chat.urls')),
     path('premium/', include('premium.urls')),
+    path('dashboard/', include('core_auth.ChartData.urls')),
    
 
 ]

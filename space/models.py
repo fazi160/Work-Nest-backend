@@ -95,9 +95,9 @@ class ConferenceHallBooking(models.Model):
     hall = models.ForeignKey(ConferenceHall, on_delete=models.CASCADE)
     booking_date = models.DateField()
     price = models.IntegerField(null=True)
+    created_date = models.DateField(auto_now=True, null=True)
 
     def save(self, *args, **kwargs):
-
         self.price = self.hall.price
         super().save(*args, **kwargs)
 
@@ -110,6 +110,7 @@ class CoworkSpaceBooking(models.Model):
     space = models.ForeignKey(CoWorkSpace, on_delete=models.CASCADE)
     booking_date = models.DateField()
     price = models.IntegerField(null=True)
+    created_date = models.DateField(auto_now=True, null=True)
 
     def save(self, *args, **kwargs):
         self.price = self.space.price
