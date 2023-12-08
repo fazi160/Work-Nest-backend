@@ -9,12 +9,13 @@ from .serializers import ConferenceHallAndCoworkSpaceBookingSerializer, PremiumB
 
 class UserCountAPIView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
-        user_type_data = kwargs.get('type')
-        queryset = User.objects.filter(user_type=user_type_data).count()
+        
+        customer_count = User.objects.filter(user_type='customer').count()
+        user_count = User.objects.filter(user_type='user').count()
 
         # You should include logic here to serialize the data if needed
         # For simplicity, I'm returning a basic JSON response
-        response_data = {'user_count': queryset}
+        response_data = {'users': [customer_count, user_count]}
 
         return JsonResponse(response_data)
 
@@ -75,8 +76,6 @@ class PremiumSales(RetrieveAPIView):
 
         # Return the annotated data
         return Response(annotated_queryset)
-
-
 
 
 # for customer dashboard
