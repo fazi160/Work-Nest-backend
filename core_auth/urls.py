@@ -16,12 +16,12 @@ urlpatterns = [
     path('UserRegister/', UserRegister.as_view(), name='UserRegister'),
     path('customerRegister/', CustomerRegister.as_view(), name='customerRegister'),
 
-    # google authentication register section
+    
     path('googleauth/', GoogleAuthentication.as_view(),
          name='GoogleAuthentication'),
 
     path('verify/<str:uidb64>/<str:token>/', VerifyUserView.as_view(),
-         name='verify-user'),  # email verification link
+         name='verify-user'),  
 
     path('userslist/', UserList.as_view(), name='user-list'),
 
@@ -31,10 +31,9 @@ urlpatterns = [
 
     path('customerdetails/', CustomerDetailListCreate.as_view(),
          name='customer-detail-list-create'),
+
     path('customerdetails/<int:pk>/', CustomerDetailRetrieveUpdateDestroy.as_view(),
          name='customer-detail-retrieve-update-destroy'),
-
-
 
     path('userdetail/<int:pk>/', CustomerDetails.as_view(), name='user-detail'),
 
@@ -42,6 +41,5 @@ urlpatterns = [
          UserDetailListCreate.as_view(), name='user-detail-create'),
     path('user/userdata/<int:pk>/',
          UserDetailRetrieveUpdateDestroy.as_view(), name='user-detail'),
-
 
 ]
