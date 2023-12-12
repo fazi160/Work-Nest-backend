@@ -38,10 +38,10 @@ urlpatterns = [
 
     path('userdetail/<int:pk>/', CustomerDetails.as_view(), name='user-detail'),
 
-    # path('user/userdata/create/',
-    #      UserDetailsCreate.as_view(), name='user-detail-create'),
-    # path('user/userdata/<int:pk>/',
-    #      UserDetails.as_view(), name='user-detail'),
+    path('user/userdata/create/',
+         UserDetailListCreate.as_view(), name='user-detail-create'),
+    path('user/userdata/<int:pk>/',
+         UserDetailRetrieveUpdateDestroy.as_view(), name='user-detail'),
 
 
 ]

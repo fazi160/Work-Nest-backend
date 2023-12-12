@@ -1,3 +1,4 @@
+from rest_framework.generics import CreateAPIView
 from django.http import Http404
 from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
@@ -35,6 +36,7 @@ from premium.models import PremiumCustomer
 from premium.serializers import PremiumCustomerSerializer
 from datetime import date
 from rest_framework import viewsets, status
+
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = myTokenObtainPairSerializer
@@ -197,17 +199,14 @@ class UserBlock(APIView):
     def put(self, request, *args, **kwargs):
         # Get the value from the URL parameter
         value_to_update = kwargs.get('pk')
-        print(value_to_update)
         if value_to_update is None:
             return Response({'error': 'Please provide a proper input.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             # Retrieve the user instance based on the provided pk
             instance = User.objects.get(pk=value_to_update)
-            print(instance)
         except User.DoesNotExist:
             return Response({'error': f'User with id={value_to_update} does not exist.'}, status=status.HTTP_404_NOT_FOUND)
-
         # Toggle the value of is_active
         instance.is_active = not instance.is_active
         print(instance)
@@ -235,7 +234,6 @@ class CustomerList(ListCreateAPIView):
 
 
 class CustomerDetailListCreate(ListCreateAPIView):
-    # print(request.user)
     queryset = CustomerDetail.objects.all()
     serializer_class = CustomerDetailSerializer
 
@@ -304,30 +302,6 @@ class CustomerDetails(RetrieveAPIView):
             return Response({"detail": "Premium customer data does not exist"}, status=404)
 
 
-from rest_framework.generics import CreateAPIView
-
-# class UserDetailsCreate(CreateAPIView):
-#     queryset = UserDetail.objects.all()
-#     serializer_class = UserDetailSerializer
-
-#     def perform_create(self, serializer):
-#         serializer.save(user=self.request.user)
-
-# class UserDetails(RetrieveUpdateDestroyAPIView):
-#     queryset = UserDetail.objects.all()
-#     serializer_class = UserDetailSerializer
-
-#     def get(self, request, *args, **kwargs):
-#         user_id = self.kwargs.get('pk')
-#         try:
-#             queryset = UserDetail.objects.get(user=user_id)
-#             serializer = self.get_serializer(queryset)
-#             return Response(serializer.data)
-#         except UserDetail.DoesNotExist:
-#             return Response({'detail': "The data does not exist"}, status=404)
-
-        
-
 class UserDetailViewSet(viewsets.ModelViewSet):
     serializer_class = UserDetailSerializer
 
@@ -338,8 +312,8 @@ class UserDetailViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
-

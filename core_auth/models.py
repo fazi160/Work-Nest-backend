@@ -45,7 +45,7 @@ class User(AbstractUser):
             # Create a notification when a new CoWorkSpace is created
             notification = AdminNotificationCreate(
                 name=f"New User Created: {self.email}",
-                description=f"A new Customer created named '{self.name}'",
+                description=f"A new Customer created named '{self.email}'",
                 is_opened=False,
                 notification_type='register',
                 # user = self.pk
