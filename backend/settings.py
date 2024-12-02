@@ -35,8 +35,6 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'daphne',
-    # 'django_crontab',
-    # "windows_auth",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,7 +47,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_simplejwt',
     'django_celery_results',
-    # 'webpush',
+    'drf_spectacular',            # swagger setting
 
 
     'channels',
@@ -61,13 +59,7 @@ INSTALLED_APPS = [
 ]
 
 
-# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-# WEBPUSH_SETTINGS = {
-#    "VAPID_PUBLIC_KEY": "BAsDZYBTqYhK1pzAw0neiH8kBsTErBkNo0SoXhpZpE6yLHuQmYP91F3XLaxGiMZ_A8c8vk7uCJK5cpIgHaEctDc",
-#    "VAPID_PRIVATE_KEY": "a2QRDb_KPvGjvFEL_Fg40m5KY95lI1fUMlQk9QHwP9w",
-#    "VAPID_ADMIN_EMAIL": "copyc195@gmail.com"
-# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -87,8 +79,17 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 50 
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'DRF APIs Documentation',
+    'DESCRIPTION': 'Documenting your APIs',
+    'VERSION': '1.0.0',
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 SIMPLE_JWT = {
@@ -156,40 +157,26 @@ ASGI_APPLICATION = 'backend.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('dbname'),
+#         'USER': config('dbuser'),
+#         'PASSWORD': config('dbpass'),
+#         'HOST': 'localhost', 
+#         'PORT': '5432',  
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('dbname'),
-        'USER': config('dbuser'),
-        'PASSWORD': config('dbpass'),
-        'HOST': 'localhost', 
-        'PORT': '5432',  
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",  # or specify your desired path
     }
 }
 
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('POSTGRES_DB', default='worknest'),
-#         'USER': config('POSTGRES_USER', default='postgres'),
-#         'PASSWORD': config('POSTGRES_PASSWORD', default='postgres'),
-#         'HOST': 'db',  
-#         'PORT': '5432',
-#     }
-# }
-
-# DATABASES = {    
-#    "default": {        
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "postgres",
-#         "USER": "postgres",
-#         "PASSWORD": "postgres",
-#         "HOST": "db",
-#         "PORT": 5432,
-#     }
-# }
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 

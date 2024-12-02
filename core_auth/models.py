@@ -69,7 +69,7 @@ class CustomerDetail(models.Model):
 
     company_name = models.CharField(max_length=50)
 
-    contact = models.CharField()
+    contact = models.CharField(max_length=15)
     
     description = models.TextField(null=True)
 
@@ -84,7 +84,7 @@ class UserDetail(models.Model):
 
     occupation = models.CharField(max_length=50)
 
-    contact = models.CharField()
+    contact = models.CharField(max_length=15)
 
 
 

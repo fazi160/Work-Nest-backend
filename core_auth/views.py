@@ -21,7 +21,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from verify_email.email_handler import send_verification_email
+# from verify_email.email_handler import send_verification_email
 from .models import User
 from .serializers import UserSerializer, myTokenObtainPairSerializer, GoogleAuthSerializer
 from django.conf import settings

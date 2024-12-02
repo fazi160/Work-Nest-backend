@@ -78,9 +78,9 @@ class StripePaymentSpace(APIView):
             print(data, userId, planId, date, spaceType,"---------------------------------------------=======================")
 
             # You can use the received data to customize the Stripe session creation
-            success_url = f'http://localhost:5173/user/spacedetails/payment/success/?userId={userId}&planId={planId}&date={date}&type={spaceType}'
+            success_url = f'https://worknest.vercel.app/user/spacedetails/payment/success/?userId={userId}&planId={planId}&date={date}&type={spaceType}'
 
-            cancel_url = 'http://localhost:5173/user/spacedetails/payment/canceled'
+            cancel_url = 'https://worknest.vercel.app/user/spacedetails/payment/canceled'
             session = stripe.checkout.Session.create(
                 line_items=[{
                     'price_data': {
